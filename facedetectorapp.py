@@ -3,6 +3,7 @@ import time
 from facedetector import FaceDetector
 from videocapture import VideoCapture
 import configparser
+import threading
 
 class FaceDetectorApp:
     def __init__(self, config_file):
@@ -22,12 +23,13 @@ class FaceDetectorApp:
         self.font_color = tuple(map(int, config.get('FONT', 'color').split(',')))
         self.status_text = config.get('STATUS', 'text')
         self.status_color = tuple(map(int, config.get('STATUS', 'color').split(',')))
+        self.is_running = False
 
-    def run(self):
+    def _run(self):
         """
-        Runs the face detector application.
+        Internal method for running the face detector application in a separate thread.
         """
-        while True:
+        while self.is_running:
             ret, frame = self.video_capture.read()
             if not ret:
                 break
@@ -43,11 +45,25 @@ class FaceDetectorApp:
             resolution_text = 'Resolution: {}x{}'.format(frame.shape[1], frame.shape[0])
             cv2.putText(frame, fps_text, (10, 30), self.font, self.font_size, self.font_color, self.font_thickness, cv2.LINE_AA)
             cv2.putText(frame, resolution_text, (10, 60), self.font, self.font_size, self.font_color, self.font_thickness, cv2.LINE_AA)
-            cv2.putText(frame, self.status_text, (10, 90), self.font, self.font_size, self.status_color, self.font_thickness, cv2.LINE_AA)
+            cv2.putText(frame,f"Status: {self.status_text}", (10, 90), self.font, self.font_size, self.status_color, self.font_thickness, cv2.LINE_AA)
             cv2.imshow('Face Detector', frame)
             key = cv2.waitKey(1)
             if key == 27: # press ESC to exit
                 break
+
+    def run(self):
+        """
+        Runs the face detector application in a separate thread.
+        """
+        self.is_running = True
+        thread = threading.Thread(target=self._run)
+        thread.start()
+
+    def stop(self):
+        """
+        Stops the face detector application.
+        """
+        self.is_running = False
         self.video_capture.release()
         cv2.destroyAllWindows()
 
