@@ -12,12 +12,14 @@ class VideoCapture:
         config = configparser.ConfigParser()
         config.read('config.ini')
 
+        print("[VideoCapture] Starting video capture...")
         self.cap = cv2.VideoCapture(0)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, config.getint('VIDEO', 'width'))
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, config.getint('VIDEO', 'height'))
         self.num_frames = 0
         self.start_time = time.time()
         self.frame_rate = 0
+        print("[VideoCapture] Video capture started.")
 
         
     def read(self):

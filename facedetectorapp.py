@@ -24,18 +24,24 @@ class FaceDetectorApp:
         self.status_text = config.get('STATUS', 'text')
         self.status_color = tuple(map(int, config.get('STATUS', 'color').split(',')))
         self.is_running = False
+        self.debug = config.getboolean('DEBUG', 'DEBUG')
+        if self.debug:
+            print('[program] starting...')
 
     def _run(self):
         """
         Internal method for running the face detector application in a separate thread.
         """
+        if self.debug:
+            print('[program] start')
         while self.is_running:
             ret, frame = self.video_capture.read()
             if not ret:
                 break
             faces = self.face_detector.detect_faces(frame)
             for (x, y, w, h) in faces:
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                cv2.rectangle(frame, (x, y), (x + w, y + h),self.status_color, 2)
+                cv2.putText(frame, f"X: {x}, Y: {y}", (x, y - 10), self.font, self.font_size, self.status_color, self.font_thickness, cv2.LINE_AA)
             elapsed_time = time.time() - self.video_capture.start_time
             if elapsed_time > 0:
                 fps = self.video_capture.num_frames / elapsed_time
@@ -50,6 +56,9 @@ class FaceDetectorApp:
             key = cv2.waitKey(1)
             if key == 27: # press ESC to exit
                 break
+
+        if self.debug:
+            print('[program] stop')
 
     def run(self):
         """
@@ -66,6 +75,10 @@ class FaceDetectorApp:
         self.is_running = False
         self.video_capture.release()
         cv2.destroyAllWindows()
+        if self.debug:
+            print('[program] exit')
+
+
 
 if __name__ == '__main__':
     app = FaceDetectorApp('config.ini')
