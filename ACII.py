@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Define the ASCII characters to use
-ASCII_CHARS = ["-", "@", "|", "%", "?", "*", "+", ";", ":", ",", "."]
+ASCII_CHARS = "╬╠╫╋║╉╩┣╦╂╳╇╈┠╚┃╃┻╅┳┡┢┹╀╧┱╙┗┞┇┸┋┯┰┖╲╱┎╘━┭┕┍┅╾│┬┉╰╭╸└┆╺┊─╌┄┈╴╶"
 
 class VideoToAscii:
     def __init__(self, device_id=0, width=180, height=60, scale_factor=0.05):
@@ -23,7 +23,7 @@ class VideoToAscii:
         @return: The corresponding ASCII character.
         """
         r, g, b = pixel
-        brightness = int((r + g + b) / 3)
+        brightness = int((r + g + b) )
         ascii_char = ASCII_CHARS[int(brightness / 255 * (len(ASCII_CHARS) - 1))]
         return ascii_char
     
